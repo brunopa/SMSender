@@ -1,11 +1,19 @@
 package controllers
 
 
-import models.Campaign
+import akka.actor.Props
+import akka.actor.Actor
+import akka.actor.Actor._
+import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Props}
+
+
+import models.{SendMessage, actorSMS, Campaign}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.libs.Akka
 
 object Sms extends Controller {
 
@@ -22,6 +30,18 @@ object Sms extends Controller {
 
 
   def send1(msg: String, phones: String) = Action {
+    val ator = Akka.system.actorOf(Props[actorSMS], "myactorSMS")
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+    ator ! SendMessage("", "", 0)
+
+    Console.println("fim actors")
     Ok(s"msg = $msg \r phones = $phones")
   }
 
@@ -40,8 +60,8 @@ object Sms extends Controller {
 }
 
 /*
-
-curl --include --request POST --header "Content-type: application/json" --data '{"message": "mensagem", "phones":["123","456","789"]}' http://localhost:9000/send
-http://localhost:9000/send1?msg=String1&fones=String2
-http://localhost:9000/send2/String1/String3
+curl --include --request POST --header "Content-type: application/json" --data '{"message": "mensagem", "phones":["123","456","789"]}' http://radiant-everglades-6796.herokuapp.com/send
+http://radiant-everglades-6796.herokuapp.com/send1?msg=String1&fones=String2
+http://radiant-everglades-6796.herokuapp.com/send2/String1/String3
++55 41 3908-8447
 * */
