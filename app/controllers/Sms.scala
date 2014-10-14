@@ -14,6 +14,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.libs.Akka
+import play.api.Play
 
 object Sms extends Controller {
 
@@ -30,18 +31,7 @@ object Sms extends Controller {
 
 
   def send1(msg: String, phones: String) = Action {
-    val ator = Akka.system.actorOf(Props[actorSMS], "myactorSMS")
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-    ator ! SendMessage("", "", 0)
-
-    Console.println("fim actors")
+    sendMessages(msg, phones)
     Ok(s"msg = $msg \r phones = $phones")
   }
 
@@ -49,17 +39,49 @@ object Sms extends Controller {
     val placeResult = request.body.validate[Campaign]
     placeResult.fold(
       errors => {
-        BadRequest(Json.obj("status" ->"KO", "message" -> JsError.toFlatJson(errors)))
+        BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))
       },
       campaign => {
-        //Place.save(place)
-        Ok(Json.obj("status" ->"OK", "message" -> (Json.toJson(campaign) ) ))
+        sendMessages(campaign.message, campaign.phones)
+        Ok(Json.obj("status" -> "OK", "message" -> (Json.toJson(campaign))))
       }
     )
   }
+
+  def sendMessages(msg: String, phones: String) {
+    sendMessages(msg, phones.split(";"))
+  }
+
+  def sendMessages(msg: String, phones: Seq[String]) {
+
+    val ator = Akka.system.actorOf(Props[actorSMS], "myactorSMS1")
+    val sid = Play.current.configuration.getString("twillo.sid").get
+    val token = Play.current.configuration.getString("twillo.token").get
+    val from = Play.current.configuration.getString("twillo.from").get
+    val url = Play.current.configuration.getString("twillo.url").get + sid + "/Messages.json"
+
+    phones
+      .map(
+        i =>
+          Json.obj(
+            "Body" -> msg,
+            "To" -> s"%2B55$i",
+            "From" -> from
+          )
+      )
+      .map(
+        params => ator ! SendMessage(url, sid, token, params, 1, 10)
+      )
+  }
+
+
+  // val futureResponse: Future[Response] = WS.url(url).post(data)
+
+
 }
 
 /*
+localhost:9000/send2/mensage de sms/983961455;971298484
 curl --include --request POST --header "Content-type: application/json" --data '{"message": "mensagem", "phones":["123","456","789"]}' http://radiant-everglades-6796.herokuapp.com/send
 http://radiant-everglades-6796.herokuapp.com/send1?msg=String1&fones=String2
 http://radiant-everglades-6796.herokuapp.com/send2/String1/String3
