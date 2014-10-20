@@ -20,17 +20,31 @@ class actorSMS extends Actor {
 
     case SendMessage(url, user, pass, params, count, max) =>
       implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
-
+/*
       val data = Json.obj(
         "Body" -> "mensage de sms",
-        "To" -> "%2B55983961455",
-        "From" -> "554139088447"
+        "To" -> "%2B5511983961455",
+        "From" -> "%2B12065573610"
       )
+*/
 
-      WS
-        .url(url)
+      WS.url(url)
         .withAuth(user, pass, WSAuthScheme.BASIC)
-        .post(data)
+        .post(
+        Map(
+          "Body" -> Seq("mensage de sms"),
+          "To" -> Seq("+5511983961455"),
+          "From" -> Seq("+12065573610")
+        )
+      )
         .map(r => Console.println(r.body))
+
+    /*
+     WS
+            .url(url)
+            .withAuth(user, pass, WSAuthScheme.BASIC)
+            .post(data)
+            .map(r => Console.println(r.body))
+            */
   }
 }
