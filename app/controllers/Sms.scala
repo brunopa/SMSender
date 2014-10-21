@@ -62,22 +62,10 @@ object Sms extends Controller {
 
     phones
       .map(
-        i =>
-          Json.obj(
-            "Body" -> msg,
-            "To" -> s"%2B55$i",
-            "From" -> from
-          )
-      )
-      .map(
-        params => ator ! SendMessage(url, sid, token, params, 1, 10)
+        i => ator ! SendMessage(url, sid, token, from, "+55" + i, msg, 1, 10)
       )
   }
-
-
   // val futureResponse: Future[Response] = WS.url(url).post(data)
-
-
 }
 
 /*
