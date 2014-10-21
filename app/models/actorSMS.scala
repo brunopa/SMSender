@@ -27,11 +27,14 @@ class actorSMS extends Actor {
 
     case SendMessage(url, user, pass, from, to, message, count, max) =>
       implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
-
+/*
       WS
         .url("https://www.google.com.br/search?&q=git")
         .get()
-        /*
+        .map(r => Console.println(r.body.length))
+  */
+
+      WS
         .url(url)
         .withAuth(user, pass, WSAuthScheme.BASIC)
         .post(
@@ -40,7 +43,7 @@ class actorSMS extends Actor {
             "To" -> Seq(to),
             "From" -> Seq(from)
         )
-      )*/
-        .map(r => Console.println(r.body.length))
+      )
+        .map(r => Console.println(r.body))
   }
 }
