@@ -1,20 +1,26 @@
 package controllers
 
 
+import java.util.concurrent.TimeUnit
+
 import akka.actor.Props
 import akka.actor.Actor
 import akka.actor.Actor._
 import akka.actor.ActorSystem
 import akka.actor.{ActorSystem, Props}
+import models.akka.pattern.throttle.Throttler.{Queue, Rate, SetTarget}
+import models.akka.pattern.throttle.TimerBasedThrottler
 
 
-import models.{SendMessage, actorSMS, Campaign}
+import models.{Teste, ActorSMS, SendMessage, Campaign}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.libs.Akka
 import play.api.Play
+
+import scala.concurrent.duration.Duration
 
 object Sms extends Controller {
 
@@ -54,16 +60,60 @@ object Sms extends Controller {
 
   def sendMessages(msg: String, phones: Seq[String]) {
 
-    val ator = Akka.system.actorOf(Props[actorSMS], "myactorSMS1")
-    val sid = Play.current.configuration.getString("twillo.sid").get
-    val token = Play.current.configuration.getString("twillo.token").get
-    val from = Play.current.configuration.getString("twillo.from").get
-    val url = Play.current.configuration.getString("twillo.url").get + sid + "/Messages.json"
+    val ator = Akka.system.actorOf(Props[ActorSMS], "myactorSMS" + Math.random().toString)
+    /* val sid = Play.current.configuration.getString("twillo.sid").get
+     val token = Play.current.configuration.getString("twillo.token").get
+     val from = Play.current.configuration.getString("twillo.from").get
+     val url = Play.current.configuration.getString("twillo.url").get + sid + "/Messages.json"
 
-    phones
-      .map(
-        i => ator ! SendMessage(url, sid, token, from, "+55" + i, msg, 1, 10)
-      )
+     phones
+       .map(
+         i => ator ! SendMessage(url, sid, token, from, "+55" + i, msg, 1, 10)
+       )*/
+
+
+    val throttler = Akka.system.actorOf(Props(
+      new TimerBasedThrottler(new Rate(1, Duration(1, TimeUnit.SECONDS))
+      )))
+
+      // Set the target
+      throttler ! SetTarget(Some(ator))
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+    throttler ! Queue(Teste("testando ai") )
+
+    //ator ! Teste("testando ai")
+
   }
   // val futureResponse: Future[Response] = WS.url(url).post(data)
 }
@@ -73,5 +123,24 @@ localhost:9000/send2/mensage de sms/983961455;971298484
 curl --include --request POST --header "Content-type: application/json" --data '{"message": "mensagem", "phones":["123","456","789"]}' http://radiant-everglades-6796.herokuapp.com/send
 http://radiant-everglades-6796.herokuapp.com/send1?msg=String1&fones=String2
 http://radiant-everglades-6796.herokuapp.com/send2/String1/String3
-+55 41 3908-8447
+
+
+
+
+/*
+name := "akka-throttler"
+organization := "akka.pattern.throttle"
+version := "1.0-SNAPSHOT"
+scalaVersion := "2.9.1"
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+crossScalaVersions := Seq("2.9.2", "2.9.1")
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" % "akka-actor" % "2.0.3" withSources,
+  "com.typesafe.akka" % "akka-testkit" % "2.0.3" % "test" withSources,
+  "junit" % "junit" % "4.5" % "test" withSources,
+  "org.scalatest" %% "scalatest" % "1.6.1" % "test" withSources,
+  "com.ning" % "async-http-client" % "1.7.4" withSources
+)
+*/
+
 * */

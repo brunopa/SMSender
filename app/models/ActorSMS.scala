@@ -1,8 +1,8 @@
 package models
 
-import akka.actor.Actor
-import akka.actor.Actor.Receive
-import akka.actor.Status.{Failure, Success}
+import _root_.akka.actor.Actor
+import _root_.akka.actor.Actor.Receive
+import _root_.akka.actor.Status.{Failure, Success}
 import com.fasterxml.jackson.databind.util.JSONPObject
 import play.api.Play.current
 import play.api.libs.json.JsObject
@@ -21,7 +21,9 @@ case class SendMessage(url: String,
                        count: Integer,
                        max: Integer)
 
-class actorSMS extends Actor {
+case class Teste(msg:String)
+
+class ActorSMS extends Actor {
 
   override def receive: Receive = {
 
@@ -32,6 +34,10 @@ class actorSMS extends Actor {
         .url("https://www.google.com.br/search?&q=git")
         .get()
         .map(r => Console.println(r.body.length))
+
+    case Teste(m) => println(m)
+
+    case _       => println("huh?")
 
 /*
       WS
