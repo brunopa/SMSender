@@ -1,2 +1,2 @@
 package models
-case class Campaign (message: String, phones: Seq[String])
+case class Campaign (message: String, phones: Seq[Int])
